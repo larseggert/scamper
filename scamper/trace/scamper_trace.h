@@ -54,6 +54,7 @@ struct scamper_addr;
 #define SCAMPER_TRACE_FLAG_DOUBLETREE   0x10 /* doubletree */
 #define SCAMPER_TRACE_FLAG_ICMPCSUMDP   0x20 /* icmp csum found in dport */
 #define SCAMPER_TRACE_FLAG_CONSTPAYLOAD 0x40 /* do not hack payload for csum */
+#define SCAMPER_TRACE_FLAG_ECN          0x80 /* report ECN relevant fields */
 
 #define SCAMPER_TRACE_TYPE_ICMP_ECHO       0x01 /* ICMP echo requests */
 #define SCAMPER_TRACE_TYPE_UDP             0x02 /* UDP to unused ports */
@@ -142,6 +143,9 @@ struct scamper_addr;
 
 #define SCAMPER_TRACE_TYPE_IS_UDP_PARIS(trace) (		\
  (trace)->type == SCAMPER_TRACE_TYPE_UDP_PARIS)
+
+#define SCAMPER_TRACE_IS_ECN(trace) (			\
+ (trace)->flags & SCAMPER_TRACE_FLAG_ECN)
 
 /*
  * macros for dealing with scamper trace flags.

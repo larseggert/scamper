@@ -362,11 +362,13 @@ static const int         L2_cnt  = sizeof(L2) / sizeof(pmtud_L2_t);
 #define TRACE_OPT_OFFSET      23
 #define TRACE_OPT_OPTION      24
 #define TRACE_OPT_RTRADDR     25
+#define TRACE_OPT_ECN         26
 
 static const scamper_option_in_t opts[] = {
   {'c', NULL, TRACE_OPT_CONFIDENCE,  SCAMPER_OPTION_TYPE_NUM},
   {'d', NULL, TRACE_OPT_DPORT,       SCAMPER_OPTION_TYPE_STR},
   {'f', NULL, TRACE_OPT_FIRSTHOP,    SCAMPER_OPTION_TYPE_NUM},
+  {'E', NULL, TRACE_OPT_ECN,         SCAMPER_OPTION_TYPE_NULL},
   {'g', NULL, TRACE_OPT_GAPLIMIT,    SCAMPER_OPTION_TYPE_NUM},
   {'G', NULL, TRACE_OPT_GAPACTION,   SCAMPER_OPTION_TYPE_NUM},
   {'l', NULL, TRACE_OPT_LOOPS,       SCAMPER_OPTION_TYPE_NUM},
@@ -4052,6 +4054,7 @@ static int trace_arg_param_validate(int optid, char *param, long long *out)
       /* these parameters are validated at execution time */
       break;
 
+    case TRACE_OPT_ECN:
     case TRACE_OPT_PMTUD:
     case TRACE_OPT_ALLATTEMPTS:
     case TRACE_OPT_TTLDST:
@@ -4186,6 +4189,10 @@ void *scamper_do_trace_alloc(char *str)
 	    }
 	  for(i=0; i<len; i+=2)
 	    payload[i/2] = hex2byte(opt->str[i], opt->str[i+1]);
+	  break;
+
+	case TRACE_OPT_ECN:
+	  flags |= SCAMPER_TRACE_FLAG_ECN;
 	  break;
 
 	case TRACE_OPT_PMTUD:

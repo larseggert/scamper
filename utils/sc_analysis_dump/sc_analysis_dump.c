@@ -121,6 +121,10 @@ static int check_options(int argc, char *argv[])
 	case 'e':
 	  options |= OPT_DSTEND;
 	  break;
+	
+	case 'E':
+	  options |= OPT_DSTEND;
+	  break;
 
 	case 'o':
 	  options |= OPT_OLDFORMAT;

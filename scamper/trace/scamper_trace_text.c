@@ -184,6 +184,26 @@ static char *icmp_tostr(const scamper_trace_hop_t *hop,
 }
 
 /*
+ * tos_tostr
+ *
+ * the caller must pass a pointer to a str buffer at least 14 chars in length
+ * to be safe.
+ */
+static char *tos_tostr(const scamper_trace_hop_t *hop,
+			char *str, const size_t len, const scamper_trace_t *trace)
+{
+  str[0] = '\0';
+  if (SCAMPER_TRACE_HOP_IS_ICMP_Q(hop) && SCAMPER_TRACE_IS_ECN(trace))
+    {
+      	snprintf(str, len, " {%d,%d}", (hop->hop_icmp_q_tos & 0xfc) >> 2, ( hop->hop_icmp_q_tos & 0x2));
+	}
+  return str;
+}
+
+
+
+
+/*
  * header_tostr
  *
  */
@@ -228,6 +248,7 @@ static char *hop_tostr(const scamper_trace_t *trace, const int h)
   char     str_addr[64];
   char     str_rtt[24];
   char     str_icmp[128];
+  char     str_tos[24];
   int      spare;
   int      replyc;
 
@@ -262,9 +283,10 @@ static char *hop_tostr(const scamper_trace_t *trace, const int h)
       scamper_addr_tostr(hop->hop_addr, str_addr, sizeof(str_addr));
       timeval_tostr_us(&hop->hop_rtt, str_rtt, sizeof(str_rtt));
       icmp_tostr(hop, str_icmp, sizeof(str_icmp));
+      tos_tostr(hop, str_tos, sizeof(str_tos), trace);
 
       snprintf(str_hop, sizeof(str_hop),
-	       "%2d  %s  %s ms%s", h+1, str_addr, str_rtt, str_icmp);
+	       "%2d  %s  %s ms%s%s", h+1, str_addr, str_rtt, str_icmp, str_tos);
       return strdup(str_hop);
     }
 
@@ -303,10 +325,11 @@ static char *hop_tostr(const scamper_trace_t *trace, const int h)
        */
       timeval_tostr_us(&hop->hop_rtt, str_rtt, sizeof(str_rtt));
       icmp_tostr(hop, str_icmp, sizeof(str_icmp));
-      len = strlen(str_rtt) + 3 + strlen(str_icmp);
+      tos_tostr(hop, str_tos, sizeof(str_tos), trace);
+      len = strlen(str_rtt) + 3 + strlen(str_icmp) + strlen(str_tos);
       if((str_rtts[i] = malloc_zero(len+1)) == NULL)
 	goto out;
-      snprintf(str_rtts[i],len+1,"%s ms%s",str_rtt,str_icmp);
+      snprintf(str_rtts[i],len+1,"%s ms%s%s",str_rtt,str_icmp,str_tos);
       len_rtts[i] = len;
 
       i++;
